@@ -36,13 +36,29 @@ my %CFG = (
 	HTTP_HIDDEN_ADMIN_PAGE	=> 'admin',
 	HTTP_WS_PING_INTERVAL	=> 30,
 
-	POOL_HOST		=> 'eu1-zcash.flypool.org',
-	POOL_PORT		=> 3333,
-	POOL_WORKER_NAME	=> 't1Vm6PbF2ZkSLshWHKwLqxD7oU6TgEDX5nV.js',
+  # POOL_HOST		=> 'zec.pool.minergate.com',
+  # POOL_PORT		=> 3357,
+  # POOL_WORKER_NAME	=> 'your@email.com',
+  # POOL_WORKER_PASS	=> 'x',
+  # POOL_KEEP_INTERVAL	=> 1 * 60,
+  # POOL_SESSION_TIMEOUT	=> 10 * 60,
+  # POOL_MINER_NAME		=> 'jazecminer',
+
+	POOL_HOST		=> 'europe.equihash-hub.miningpoolhub.com',
+	POOL_PORT		=> 20570,
+	POOL_WORKER_NAME	=> 'worker.name',
 	POOL_WORKER_PASS	=> 'x',
 	POOL_KEEP_INTERVAL	=> 1 * 60,
 	POOL_SESSION_TIMEOUT	=> 10 * 60,
 	POOL_MINER_NAME		=> 'jazecminer',
+
+	#POOL_HOST		=> 'eu1-zcash.flypool.org',
+	#POOL_PORT		=> 3333,
+	#POOL_WORKER_NAME	=> 't1Vm6PbF2ZkSLshWHKwLqxD7oU6TgEDX5nV.js',
+	#POOL_WORKER_PASS	=> 'x',
+	#POOL_KEEP_INTERVAL	=> 1 * 60,
+	#POOL_SESSION_TIMEOUT	=> 10 * 60,
+	#POOL_MINER_NAME		=> 'jazecminer',
 );
 
 if (@ARGV) {
@@ -106,7 +122,7 @@ my $stat_timer = AnyEvent->timer (
 	cb		=> sub {
 		local *__ANON__ = 'stat.timer';
 
-		$STAT{'accepted sol/s'} = sprintf '%.4f', 
+		$STAT{'accepted sol/s'} = sprintf '%.4f',
 		    ($STAT{$GOAL} || 0) / $CFG{STAT_INTERVAL};
 		I "$_ = $STAT{$_}\n" for sort keys %STAT;
 
@@ -317,7 +333,7 @@ sub stratum_tick {
 
 		on_timeout	=> sub {
 			local *__ANON__ = 'stratum.on_timeout';
-	
+
 			I 'timeout';
 			stratum_close ();
 		},
@@ -325,7 +341,7 @@ sub stratum_tick {
 		on_eof		=> sub {
 			my ($h) = @_;
 			local *__ANON__ = 'stratum.on_eof';
-	
+
 			I 'disconnected';
 			stratum_close ();
 		},
@@ -333,7 +349,7 @@ sub stratum_tick {
 		on_error	=> sub {
 			my ($h, $fatal, $msg) = @_;
 			local *__ANON__ = 'stratum.on_error';
-	
+
 			E "error $msg (${\int $!})";
 			$stratum_h->destroy;
 			stratum_close ();
@@ -535,11 +551,11 @@ sub http {
 	} elsif ($req eq "$CFG{HTTP_HIDDEN_ADMIN_PAGE}?resetbans") {
 		%BAN = ();
 		goto ADMIN;
-		
+
 	} elsif ($req eq $CFG{HTTP_HIDDEN_ADMIN_PAGE}) {
 ADMIN:		http_ok ($h, admin ());
 		$STAT{'http requests admin'}++;
-		
+
 	} elsif ($req eq 'ws') {
 		$STAT{'http requests ws'}++;
 		$h->{rbuf} =~ s/^/$buf\n/;
@@ -557,7 +573,7 @@ ADMIN:		http_ok ($h, admin ());
 tcp_server $CFG{HTTP_ADDR}, $CFG{HTTP_PORT}, sub {
 	my ($fh, $host, $port) = @_;
 	local *__ANON__ = 'httpd.cb';
-   
+
 	my $h = new AnyEvent::Handle (
 		fh		=> $fh,
 		timeout		=> $CFG{HTTP_CLIENT_TIMEOUT},

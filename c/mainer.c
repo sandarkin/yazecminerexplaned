@@ -352,8 +352,8 @@ json_do (void) {
 	 *   { id:1, result:[], error:null }
 	 */
 
-	if (flag_debug > 2)
-		json_debug ();
+/*	if (flag_debug > 2)
+		json_debug ();*/
 
 	pos_id = json_key_pos (0, "id", 1);
 	if (json_token[pos_id].type != JSMN_PRIMITIVE)

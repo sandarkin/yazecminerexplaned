@@ -6,22 +6,22 @@
 #include "blake2b.h"
 #include "equihash.h"
 
-#define DEBUG			0
+#define DEBUG			1
 
 typedef uint32_t		word_t;
 
-#define STRING_IDX_BITS		(WN / (WK + 1) + 1)
-#define STRINGS			(1 << STRING_IDX_BITS)
-#define SOLUTION_NUMS		(1 << WK)
-#define STEP_BITS		(WN / (WK + 1))
+#define STRING_IDX_BITS		(WN / (WK + 1) + 1) // 21
+#define STRINGS			(1 << STRING_IDX_BITS) // 2097152
+#define SOLUTION_NUMS		(1 << WK) // 512
+#define STEP_BITS		(WN / (WK + 1)) // 20
 
 #define BYTE_BITS		(8)
 #define WORD_BYTES		((int)sizeof (word_t))
 #define WORD_BITS		(WORD_BYTES * BYTE_BITS)
 #define DIV_UP(x,r)		((x + r - 1) / r)
 
-#define STRING_BITS		(WN)
-#define STRING_BYTES		(STRING_BITS / BYTE_BITS)
+#define STRING_BITS		(WN) // 200
+#define STRING_BYTES		(STRING_BITS / BYTE_BITS) // 25
 #define STRING_WORDS		DIV_UP (STRING_BYTES, WORD_BYTES)
 #define STRING_ALIGN_BITS	(STRING_WORDS * WORD_BITS - STRING_BITS)
 #define STRING_ALIGN_BYTES	(STRING_ALIGN_BITS / BYTE_BITS)
@@ -56,9 +56,9 @@ typedef uint32_t		word_t;
 #define L2_FIRST_BIT(step)	BIT_IDX (STRING_ALIGN_BITS + (step    ) * STEP_BITS - L2_BITS)
 #define L212_LAST_BIT(step)	BIT_IDX (STRING_ALIGN_BITS + (step + 1) * STEP_BITS - 1)
 
-#define HASH_STRINGS		(BLAKE2B_OUTBYTES / STRING_BYTES)
-#define HASH_BYTES		(HASH_STRINGS * STRING_BYTES)
-#define HASHES			(STRINGS / HASH_STRINGS)
+#define HASH_STRINGS		(BLAKE2B_OUTBYTES / STRING_BYTES) // 2
+#define HASH_BYTES		(HASH_STRINGS * STRING_BYTES) // 50
+#define HASHES			(STRINGS / HASH_STRINGS) // 1048576
 
 #define L12L2Z(i12,i2)		((i12) << L2Z_BITS | (i2))
 #define L12L2Z_L2Z(pack)	((pack) & L2Z_MASK)
@@ -195,9 +195,13 @@ step0 (block_t *p) {
 	for (h = 0; h < HASHES; h++) {
 		blake2b_zcash (&state, h, hash);
 
-		for (i = 0; i < HASH_STRINGS; i++)
-			step0_add (h * HASH_STRINGS + i,
-			    hash + i * STRING_BYTES);
+		for (i = 0; i < HASH_STRINGS; i++) {
+			step0_add(h * HASH_STRINGS + i, hash + i * STRING_BYTES);
+//			printf ("STRING: \n");
+//			printf ("%02x", h * HASH_STRINGS + i);
+//			printf ("%02x", hash + i * STRING_BYTES);
+//			printf ("\n");
+		}
 	}
 	if (DEBUG) {
 		printf ("step0\n");
