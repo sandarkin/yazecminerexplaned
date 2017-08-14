@@ -492,8 +492,28 @@ above_target (void) {
 	int		i;
 	uint8_t		diff[SHA256_DIGEST_SIZE];
 
+	char heXblock[1487 * 2 + 1];
+	hex (heXblock, (uint8_t *)&block, 1487);
+	Log ("===================================== FULL BLOCK =====================================");
+	Log (heXblock);
+	//solsize
+	char heXsolsize[3 * 2 + 1];
+	hex (heXsolsize, block.solsize, 3);
+	Log ("===================================== SOL SIZE =====================================");
+	Log (heXsolsize);
+
+
 	sha256 ((uint8_t *)&block, sizeof (block), diff);
+	char heXdiff1[SHA256_DIGEST_SIZE * 2 + 1];
+	hex (heXdiff1, diff, SHA256_DIGEST_SIZE);
+	Log ("===================================== DIFF 1 =====================================");
+	Log (heXdiff1);
+
 	sha256 (diff, SHA256_DIGEST_SIZE, diff);
+	char heXdiff2[SHA256_DIGEST_SIZE * 2 + 1];
+	hex (heXdiff2, diff, SHA256_DIGEST_SIZE);
+	Log ("===================================== DIFF 2 =====================================");
+	Log (heXdiff2);
 
 	if (flag_debug > 1) {
 		printf ("sol difficulty ");
@@ -522,8 +542,13 @@ solution (void) {
 	stat_found++;
 	stat_found_cur++;
 	if (above_target ()) {
-		if (flag_debug)
-			printf ("above target\n");
+		if (flag_debug) {
+			printf("above target\n");
+			char heXsolution[sizeof (block.solution) * 2 + 1];
+			hex (heXsolution, block.solution, sizeof (block.solution));
+			Log ("===================================== SOLUTION =====================================");
+			Log (heXsolution);
+		}
 		return 0;
 	}
 
@@ -745,6 +770,30 @@ NEW_JOB:
 		if (flag_debug > 0)
 			nonce2_print ();
 		stat_print ();
+		char heXversion[4];
+		char heXprevhash[sizeof (block.prevhash) * 2 + 1];
+		char heXmerkleroot[sizeof (block.merkleroot) * 2 + 1];
+		char heXreserved[sizeof (block.reserved) * 2 + 1];
+		char heXtime[sizeof (block.time) * 2 + 1];
+		char heXbits[sizeof (block.bits) * 2 + 1];
+		char heXnonce[sizeof (block.nonce) * 2 + 1];
+		hex (heXversion, block.version, sizeof (block.version));
+		hex (heXprevhash, block.prevhash, sizeof (block.prevhash));
+		hex (heXmerkleroot, block.merkleroot, sizeof (block.merkleroot));
+		hex (heXreserved, block.reserved, sizeof (block.reserved));
+		hex (heXtime, block.time, sizeof (block.time));
+		hex (heXbits, block.bits, sizeof (block.bits));
+		hex (heXnonce, block.nonce, sizeof (block.nonce));
+		Log ("===================================== BLOCK =====================================");
+		Log (heXversion);
+		Log (heXprevhash);
+		Log (heXmerkleroot);
+		Log (heXreserved);
+		Log (heXtime);
+		Log (heXbits);
+		Log (heXnonce);
+		Log ("===================================== WORK =====================================");
+		Log ("%s%s%s%s%s%s%s", heXversion, heXprevhash, heXmerkleroot, heXreserved, heXtime, heXbits, heXnonce);
 		step0 (&block);
 		for (i = 1; i <= WK; i++) {
 #if INTERRUPT

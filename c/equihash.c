@@ -204,8 +204,8 @@ step0 (block_t *p) {
 		}
 	}
 	if (DEBUG) {
-		printf ("step0\n");
-		fflush (stdout);
+		//printf ("step0\n");
+		//fflush (stdout);
 	}
 }
 
@@ -306,8 +306,6 @@ genstep##step (void) { \
 	\
 	l1_init (l1t); \
 	if (DEBUG) { \
-		printf ("step %d\n", step); \
-		fflush (stdout); \
 	} \
 	for (i1 = 0; i1 < L1_BOXES; i1++) { \
 		memset (l3cnt, 0, sizeof (l3cnt)); \
